@@ -1,0 +1,38 @@
+
+#Correlations
+
+#Correlations can be tested between two variables using cor.test()
+
+#The following data shows the Height vs. Femur Length measurements (both in inches) for 10 men:
+height<- c(70.8,66.2,71.7,68.7,67.6,69.2,66.5,67.2,68.3,65.6)
+femur.length<-c(42.5,40.2,44.4,42.8,40.0,47.3,43.4,40.1,42.1,36)
+#take a look at the data
+plot(height,femur.length)
+#test for a significant correlation
+cor.test(height,femur.length)
+
+#Correlations can be tested between multiple variables using cor()
+setwd("C:/Users/jquinn2/Documents/My Box Files/Teaching/Research and Anaylsis/Code with directions")
+# Data Source - http://www.isleroyalewolf.org/data/data/home.html
+isleroyale<-read.csv("isleroyale.csv")
+summary(isleroyale)
+
+#correlation test
+cor(isleroyale, use="pairwise.complete.obs", method="pearson") # correlation between each pair of variables is computed using all complete pairs of observations on those variables.
+# yikes thats a lot of data!
+
+# you can call individual columns 
+plot(isleroyale$wolf.abundance,isleroyale$moose.abundance)
+cor.test(isleroyale$wolf.abundance,isleroyale$moose.abundance)
+cor(isleroyale$wolf.abundance,isleroyale$moose.abundance)
+# or you can create a smaller data set by defining 2+ columns of interest
+names(isleroyale)
+newdata <- isleroyale[c(2,3,17:24)] # columns selected 2, 3, & 17-24
+summary(newdata)
+cor(newdata, use="pairwise.complete.obs")
+
+#but no p values
+#Hmisc package provides an alternative.  
+install.packages("Hmisc")
+library(Hmisc)
+rcorr(as.matrix(newdata), type="pearson")  # replace pearson with spearman for non-parametic
