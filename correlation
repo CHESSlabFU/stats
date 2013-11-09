@@ -1,4 +1,3 @@
-
 #Correlations
 
 #Correlations can be tested between two variables using cor.test()
@@ -12,7 +11,7 @@ plot(height,femur.length)
 cor.test(height,femur.length)
 
 #Correlations can be tested between multiple variables using cor()
-setwd("C:/Users/jquinn2/Documents/My Box Files/Teaching/Research and Anaylsis/Code with directions")
+setwd()
 # Data Source - http://www.isleroyalewolf.org/data/data/home.html
 isleroyale<-read.csv("isleroyale.csv")
 summary(isleroyale)
