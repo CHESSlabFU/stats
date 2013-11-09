@@ -1,0 +1,90 @@
+# T-Test
+
+#One sample t-test
+#The rule of thumb is that the BMI for a normal-weight individual should be between 20 and 25
+#We want to know if our data deviate systematically from that. 
+#You might use a one-sample t test to assess whether the six persons' BMI can be assumed to have mean 22.5 given that they come from a normal distribution. 
+#To answer this question you can use the function t.test. ()
+
+weight<- c(60,72,57,90,95,89)
+height <- c(1.75,1.80,1.65,1.90, 1.74,1.91)
+
+sum(weight)
+mean(weight)
+sd(weight)
+var(weight)
+range (weight)
+
+#caculate BMI
+bmi<-weight/height^2
+bmi
+
+#t-test to evaluate if mean bmi (i.e., mu) in the sample differs from 22.5 the mean for the population 
+#or test the null hypothesis that the population mean bmi=22.5
+shapiro.test (bmi)
+t.test(bmi, mu=22.5)
+
+#Two Sample test
+#Two-sample t-tests
+# how you use the t-test function depends on your data are organized.
+# if your data are both numeric (i.e, two columns of numeric data use the first option)
+# if your data are  numeric and a binary factor use the section option
+# for more information visit http://www.statmethods.net/stats/ttest.html
+
+
+# code when both are numeric
+#generate samples from populations with different means
+# in this case the body mass of Peregine Falcons http://en.wikipedia.org/wiki/Peregrine_Falcon
+samp1 <- rnorm (n=25, mean=665, sd=3)#  Body mass in grams of sample European peregrine falcons  
+samp2 <- rnorm (n=25, mean=600, sd=3)#  Body mass in grams of sample N.American peregrine falcons  
+
+summary(samp1)
+summary(samp2)
+shapiro.test (samp1)
+shapiro.test (samp2)
+
+plot(density(samp1))
+plot(density(samp2))
+
+t.test(samp1, samp2)  
+
+# code when data is numeric and binary, but still two samples
+# again we generate our own data set
+JD <- as.integer(rnorm (n=100, mean=90, sd=1))
+elev<- c(rep("high",50), rep("low", 50))
+data<-data.frame(JD,elev)
+summary(data)
+shapiro.test (data$JD)
+t.test(data$JD~data$elev) 
+t.test(JD~elev, data=data)
+
+
+#Paired Samples T-Test
+ex<-read.csv("exercise.csv")
+summary(ex)
+shapiro.test (ex$rv)
+#note that all we do is add paired=T
+t.test(rv~ev, data=ex, paired=T)
+
+
+#Paired Samples T-test example#2
+http://www.maths.adelaide.edu.au/simon.tuke/SAM/files/SAMP6S.pdf
+
+#nonparametic options
+#Wilcoxon Rank Sum (= Mann Whitney U; analogous to independent samples t-test)
+spider<-read.csv("spider.csv")
+spider
+shapiro.test (spider$rank)
+wilcox.test(rank~hair, data=spider)
+
+#Wilcoxon Signed Rank (Analogous to paired t-test)
+#http://udel.edu/~mcdonald/statsignedrank.html
+trees<-read.csv("cltrees.csv")
+summary(trees)
+
+wilcox.test(Data~Month, data=trees, paired=T)
+
+#Wilcoxon Signed Rank (Analogous to paired t-test)
+cats<-read.csv("kitten.csv")
+summary(cats)
+wilcox.test(cats$Without,cats$With, data=cats, paired=T)
