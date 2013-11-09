@@ -1,0 +1,135 @@
+# ANOVA & Kruskal Wallace
+setwd()
+
+#import data
+traffic<- read.csv("traffic_amgo.csv")
+summary(traffic)
+traffic
+
+#test for normality and homogeneity
+by(traffic$amgomin, traffic$traffic, shapiro.test) 
+by(traffic$amgomax, traffic$traffic, shapiro.test) 
+shapiro.test(traffic$amgomax)
+bartlett.test(amgomin~traffic, data=traffic);bartlett.test(amgomax~traffic, data=traffic)
+summary(aov(amgomin~traffic, data=traffic))
+kruskal.test(amgomax~traffic, data=traffic)
+
+#Barplot with error bars
+
+###A function - just copy and paste between the next 6 lines ###
+error.bar <- function(x, y, upper, lower=upper, length=0.1,...){
+  if(length(x) != length(y) | length(y) !=length(lower) | length(lower) != length(upper))
+    stop("vectors must be same length")
+  arrows(x,y+upper, x, y-lower, angle=90, code=3, length=length, ...)
+}
+#### Copy and paste above. Do not edit##
+
+
+# the next 4 lines caculate the mean and sd for each response variable by treatment
+amgomax.mean<-tapply(traffic$amgomax, traffic$traffic, mean) 
+amgomin.mean<-tapply(traffic$amgomin, traffic$traffic, mean) 
+amgomax.sd<-tapply(traffic$amgomax, traffic$traffic, sd) 
+amgomin.sd<-tapply(traffic$amgomin, traffic$traffic,sd)
+
+amgomax.mean
+
+bar.p.max <-barplot(c(amgomax.mean),
+                names.arg=c("High", "Low"),
+                ylim = c(0, 5000), 
+                ylab="Hertz",
+                col="darkblue")
+
+error.bar(bar.p.max,c(amgomax.mean), (c(amgomax.sd))) #sd
+
+bar.p.min <-barplot(c(amgomin.mean), names.arg=c("High", "Low"), ylim = c(0, 5000), ylab="Hertz", col="darkblue")
+error.bar(bar.p.min,c(amgomin.mean), (c(amgomin.sd))) #sd
+#error.bar(bar.p,c(amgomax.mean,amgomin.mean), 1.96*(c(1.6,2.3,2.2))) #se
+
+# what about a standared box plot
+boxplot(amgomax~traffic, data=traffic,col=c("red","blue"))
+boxplot(amgomin~traffic, data=traffic, col=c("purple","gray"))
+
+install.packages("ggplot2")
+library(ggplot2)
+
+qplot(traffic, amgomax, data=traffic,geom="boxplot", main="AMGO Max",xlab="", ylab="Frequency",fill=traffic)
+qplot(traffic, amgomin, data=traffic,geom="boxplot", main="AMGO min",xlab="", ylab="Frequency",fill=traffic)
+
+# Example #2 with post-hoc test
+setwd("C:/Users/jquinn2/Documents/My Box Files/Teaching/Research and Anaylsis/Code with directions")
+#import data
+bm<-read.csv("biomass.csv")
+str(bm)
+
+#test for normality and homogeneity
+shapiro.test(bm$Biomass)
+bartlett.test(Biomass~Treatment, data=bm)
+
+#ANOVA
+fm1<-aov(Biomass~Treatment, data=bm)
+#generate F-table
+summary(fm1)
+# post hoc test
+TukeyHSD(fm1)
+
+#Example #3
+#Factorial design: ANOVA with two fixed factors
+#Interaction Zone
+setwd()
+algae<-read.csv("18e3IntertidalAlgae.csv")
+summary(algae)
+fm1<-aov(sqrtarea~herbivores*height, data=algae)
+summary(fm1)
+boxplot(sqrtarea~herbivores*height, data=algae)
+
+#Example #4
+#Randomized Block Design
+zoo<-read.csv("18e2ZooplanktonDepredation.csv")
+zoo
+summary(zoo)
+fm1<-aov(zooplankton~1+treatment+block, data=zoo)
+summary(fm1)
+
+
+#Example #5
+#Dunnett's test for multiple comparisons
+seed<-read.csv("seeds.csv")
+summary(seed)
+fm1<-aov(root~treatment, data=seed)
+summary(fm1)
+
+#install.packages("multcomp") #package for multiple comparisons
+library(multcomp) 
+dt1 <- glht(fm1, linfct = mcp(treatment = "Dunnett"))
+summary(dt1)
+
+
+# Example #6 - making your own data
+
+JDay <- as.integer(c(rnorm (n=500, mean=90, sd=1), rnorm (n=500, mean=92, sd=1)))
+elev<- c(rep("high",500), rep("low", 500))
+year<- c(rep("y1", 250), rep("y2", 250),rep("y1", 250), rep("y2", 250))
+
+
+#combine the data in one data frame
+JD<-data.frame(JDay,elev,year)
+summary(JD)
+JD[1:5,]
+
+#Diagnostics
+
+#anaylize the data
+summary(aov(JDay ~ elev, data=JD))
+summary(aov(JDay ~ year, data=JD))
+summary(aov(JDay~ year+elev, data=JD))
+summary(aov(JDay ~ elev*year, data=JD))
+
+# which is a better model
+fm1 <- lm(JDay ~ elev, data=JD)
+fm2 <- lm(JDay ~ year, data=JD)
+fm3 <- lm(JDay ~ elev*year, data=JD)
+fm4 <- lm(JDay ~ elev + year, data=JD)
+AIC(fm1,fm2,fm3, fm4)
+fm1
+
+TukeyHSD(fm3)
