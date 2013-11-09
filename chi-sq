@@ -1,0 +1,78 @@
+
+#Chi-Sq Goodness of Fit
+#Gender Ratio on the Titanic
+#http://en.wikipedia.org/wiki/RMS_Titanic\
+gender<-matrix(c(1731,470), nrow=1)
+gender
+colnames(gender) <- c("male","female")
+gender
+test<-chisq.test(gender) # was the difference different from 50/50
+test
+test$observed
+test$expected
+
+# however given the fact the crew was more mostly male, a 50/50 split is unlikely
+
+null.probs <- c(2/3,1/3) # per haps 2/3 male and 1/3 femail is more suitable
+chisq.test(gender, p=null.probs)
+
+null.probs <- c(0.75,0.25) # or 0.75/0.25
+chisq.test(gender, p=null.probs)
+null.probs <- c(0.78,0.22) # but we can find non-sig..
+
+
+#Chi-sq test for independence
+
+#Example 2 - surivial on the Titanic by gender
+#http://en.wikipedia.org/wiki/RMS_Titanic
+titanic <- matrix(c(126,344,1364,367),nrow=2,byrow=T)
+colnames(titanic) <- c("Dead","Alive")
+rownames(titanic) <- c("Female", "Male")
+titanic
+
+chisq.test(titanic)
+
+barplot((titanic),beside=F,legend = rownames(titanic),col=c("blue","hotpink"), ylim=c(0,1600))
+mc<-matrix(c (1490,711,1490,711),nrow=2,byrow=T)
+mc
+tc<-titanic/mc
+tc
+barplot((tc),beside=F,col=c("blue","hotpink"), ylab="% Survive", ylim=c(0,1.19))
+legend (.8,1.18,rownames(titanic),col=c("blue","hotpink"),bty="n", fill=c("blue","hotpink"), horiz=TRUE)
+
+
+#Example #2 with a 3x3 matrix
+# Caffeine intake by class in school. 
+caff.class<- c(652,1537,598,242,36,46,38,21,218,327,106,67)
+caff.class <- matrix(c(652,1537,598,242,36,46,38,21,218,327,106,67), nrow=3,byrow=T)
+colnames(caff.class) <- c("0","1-150","151-300",">300")
+rownames(caff.class) <- c("Freshmen", "Sophomore", "Junior")
+caff.class
+
+chisq.test(caff.class)
+
+chisq.test(caff.class)$observed
+chisq.test(caff.class)$expected
+
+O <- chisq.test(caff.class)$observed
+E <- chisq.test(caff.class)$expected
+
+(O-E)^2/E
+
+#Example #3
+#Rocky Mt. Spotted Fever survial in the East US vs West US
+#http://www.cdc.gov/rmsf/
+rmf <- matrix(c(747-210,210,661-122,122),nrow=2,byrow=T)
+colnames(rmf) <- c("Alive","Dead")
+rownames(rmf) <- c("East","West")
+rmf
+chisq.test(rmf)
+
+#Fischer Exact Test
+rmf <- matrix(c(2,6,6,1),nrow=2,byrow=T)
+colnames(rmf) <- c("Alive","Dead")
+rownames(rmf) <- c("East","West")
+rmf
+chisq.test(rmf)
+fisher.test(rmf)
+
